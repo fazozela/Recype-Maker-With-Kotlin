@@ -1,5 +1,5 @@
 fun main() {
-    val landingMessage = """
+    val landingMessage = {println("""
         :: BIENVENIDO A RECYPERMAKER ::
         
         Selecciona la opción deseada
@@ -7,68 +7,85 @@ fun main() {
         2. Ver mis recetas
         3. Salir
         
-    """.trimIndent()
+    """.trimIndent())}
 
-    val chooseOptionMessage = "Elija su opción: "
-    val chooseIngredientMessage = "Elija su ingrediente: "
+    val chooseOptionMessage = { print("Elija su opción: ") }
+    val chooseIngredientMessage = { print("\nElija su ingrediente: " )}
 
     val listOfIngredients: List<String> = listOf("Agua", "Leche", "Carne", "Verduras", "Frutas", "Cereal", "Huevos", "Aceite")
-    var savedIngredients: MutableList<String> = mutableListOf<String>()
+    val savedIngredients: MutableList<String> = mutableListOf<String>()
+
+    val makeRecipe = { list: List<String> ->
+
+        println("\n:: Elija sus Ingredientes ::\n")
+
+        listOfIngredients.forEachIndexed { index: Int, s: String ->
+            println("${index+1}. $s")
+        }
+        println("9. Salir al menú")
+    }
+
+    val viewRecipe = { ingredientes: MutableList<String>,  response: String? ->
+
+        when(response?.toInt()) {
+            1 -> savedIngredients.add("Agua")
+            2 -> savedIngredients.add("Leche")
+            3 -> savedIngredients.add("Carne")
+            4 -> savedIngredients.add("Verduras")
+            5 -> savedIngredients.add("Frutas")
+            6 -> savedIngredients.add("Cereal")
+            7 -> savedIngredients.add("Huevos")
+            8 -> savedIngredients.add("Aceite")
+            else -> landingMessage()
+        }
+    }
+
+    val viewSaved = { ingredients: MutableList<String> ->
+
+        println("""
+                
+                1. receta guardada: $ingredients
+                2. Volver al menu
+                
+                """.trimIndent())
+        chooseOptionMessage()
+
+        val resp = readLine()
+
+        when(resp?.toInt()){
+            1 -> println(ingredients)
+            2 -> landingMessage()
+        }
+
+    }
+
+
 
     test@ do{
 
-        println(landingMessage)
-        print(chooseOptionMessage)
+        landingMessage()
+        chooseOptionMessage()
 
         val response = readLine()
 
         if(response?.toInt() == 1){
 
             do{
-                println("\n:: Elija sus Ingredientes ::\n")
 
-                listOfIngredients.forEachIndexed { index: Int, s: String ->
-                    println("${index+1}. $s")
-                }
-                println("9. Salir al menú")
+                makeRecipe(listOfIngredients)
 
-                print("\n$chooseIngredientMessage")
-
+                chooseIngredientMessage()
 
                 val ingredientResponse = readLine()
 
-                when(ingredientResponse?.toInt()) {
-                    1 -> savedIngredients.add("Agua")
-                    2 -> savedIngredients.add("Leche")
-                    3 -> savedIngredients.add("Carne")
-                    4 -> savedIngredients.add("Verduras")
-                    5 -> savedIngredients.add("Frutas")
-                    6 -> savedIngredients.add("Cereal")
-                    7 -> savedIngredients.add("Huevos")
-                    8 -> savedIngredients.add("Aceite")
-                    else -> continue@test
-                }
+                viewRecipe(savedIngredients, ingredientResponse)
 
 
             }while(ingredientResponse?.toInt()!! <= 8)
 
         } else if(response?.toInt() == 2){
-            test2@ do{
-                println("""
-                
-                1. receta guardada: $savedIngredients
-                2. Volver al menu
-                
-                """.trimIndent())
-                print(chooseOptionMessage)
 
-                val seeMenuResponse = readLine()
-                if(seeMenuResponse?.toInt() == 2){
-                    continue@test
-                }else{
-                    continue@test2
-                }
-            }while(seeMenuResponse?.toInt()!! <= 2)
+            viewSaved(savedIngredients)
 
         }else{
             print("\n\n :: Gracias por usar Recype Maker :) ::\n\n")
